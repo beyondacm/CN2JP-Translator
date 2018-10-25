@@ -1,4 +1,4 @@
-### CN-JP Translator DEMO
+### CN2JP-Translator DEMO
 
 ![](./cn-jp-trans.gif)
 
