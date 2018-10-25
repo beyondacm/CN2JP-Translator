@@ -28,28 +28,28 @@ class Train_Data(object):
         self.MIN_LENGTH = 1 
         self.MAX_LENGTH = 16 
         self.corpus = self.load_corpus()
-        print(len(self.corpus))
+        # print(len(self.corpus))
 
         self.X_r, self.y_r = self.get_raw_pairs()
-        print(len(self.X_r), len(self.y_r))
-        print(self.X_r[0], self.y_r[0])
+        # print(len(self.X_r), len(self.y_r))
+        # print(self.X_r[0], self.y_r[0])
 
         self.source_vocab = list(set(flatten(self.X_r)))
         self.target_vocab = list(set(flatten(self.y_r)))
-        print(len(self.source_vocab), len(self.target_vocab))
+        # print(len(self.source_vocab), len(self.target_vocab))
 
         self.source2index = self.get_source2index()
         self.index2source = self.get_index2source()
         self.target2index = self.get_target2index()
         self.index2target = self.get_index2target()
-        print(len(self.source2index), len(self.target2index))
+        # print(len(self.source2index), len(self.target2index))
 
         self.X_p, self.y_p = self.get_pro_pairs()
-        print(len(self.X_p), len(self.y_p))
+        # print(len(self.X_p), len(self.y_p))
         pass
     
     def load_corpus(self):
-        corpus = open('../cn-jp.txt', 'r', encoding='utf-8').readlines()
+        corpus = open('./cn-jp.txt', 'r', encoding='utf-8').readlines()
         # corpus = open('../fra-eng.txt', 'r', encoding='utf-8').readlines()
         return corpus
 
@@ -75,12 +75,21 @@ class Train_Data(object):
         return X_r, y_r
     
     def get_source2index(self):
+        if os.path.exists('./source2index.pickle'):
+            print('loading source2index ...')
+            with open('./source2index.pickle', 'rb') as handle:
+                source2index = pickle.load(handle)
+                return source2index
+        # first init
+        print('making source2index')
         source2index = {'<PAD>': 0, '<UNK>': 1, '<s>': 2, '</s>': 3}
         for vo in self.source_vocab:
             if source2index.get(vo) is None:
                 source2index[vo] = len(source2index)
+        # save as pickle
+        with open('./source2index.pickle', 'wb') as handle:
+            pickle.dump(source2index, handle, protocol=pickle.HIGHEST_PROTOCOL)
         return source2index
-        pass
 
     def get_index2source(self):
         index2source = {v:k for k, v in self.source2index.items()}
@@ -88,12 +97,21 @@ class Train_Data(object):
         pass
         
     def get_target2index(self):
+        if os.path.exists('./target2index.pickle'):
+            print('loading target2index...')
+            with open('./target2index.pickle', 'rb') as handle:
+                target2index = pickle.load(handle)
+                return target2index
+        # first time init
+        print('making target2index...')
         target2index = {'<PAD>': 0, '<UNK>': 1, '<s>': 2, '</s>': 3}
         for vo in self.target_vocab:
             if target2index.get(vo) is None:
                 target2index[vo] = len(target2index)
+        # save as pickle
+        with open('target2index.pickle', 'wb') as handle:
+            pickle.dump(target2index, handle, protocol=pickle.HIGHEST_PROTOCOL)
         return target2index 
-        pass
 
     def get_index2target(self):
         index2target = {v:k for k, v in self.target2index.items()}
@@ -169,6 +187,9 @@ class Test_Data():
         test_data = list(zip(self.X_p, self.y_p))
         return test_data
 
+
+
 # train = Train_Data()   
+
 # print('========================')
 # test = Test_Data()
